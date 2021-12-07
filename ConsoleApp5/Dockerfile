@@ -1,0 +1,34 @@
+FROM mcr.microsoft.com/dotnet/sdk:5.0 AS build
+WORKDIR /app
+
+# Copy csproj and restore as distinct layers
+COPY *.csproj ./
+RUN dotnet restore
+
+# Copy everything else and build
+COPY . ./
+RUN dotnet publish -c Release -f net5.0 -o out
+
+# Build runtime image
+FROM mcr.microsoft.com/dotnet/runtime:5.0
+WORKDIR /app
+COPY --from=build /app/out .
+
+RUN apt-get update \
+    && apt-get install -y \
+    curl
+
+# Set up Datadog APM
+ARG TRACER_VERSION=1.30.0
+RUN mkdir -p /var/log/datadog
+RUN mkdir -p /opt/datadog
+RUN curl -LO https://github.com/DataDog/dd-trace-dotnet/releases/download/v${TRACER_VERSION}/datadog-dotnet-apm_${TRACER_VERSION}_amd64.deb
+RUN dpkg -i ./datadog-dotnet-apm_${TRACER_VERSION}_amd64.deb
+
+ENV CORECLR_ENABLE_PROFILING=1
+ENV CORECLR_PROFILER={846F5F1C-F9AE-4B07-969E-05C26BC060D8}
+ENV CORECLR_PROFILER_PATH=/opt/datadog/Datadog.Trace.ClrProfiler.Native.so
+ENV DD_DOTNET_TRACER_HOME=/opt/datadog
+ENV DD_AGENT_HOST=host.docker.internal
+
+CMD ["dotnet", "ConsoleApp.dll"]
