@@ -12,9 +12,9 @@ namespace ConsoleApp
             var baseAddress = new Uri("https://www.example.com/");
             var regularHttpClient = new HttpClient { BaseAddress = baseAddress };
 
-            Console.WriteLine("Calling regularHttpClient.GetAsync");
+            Console.WriteLine("Calling regularHttpClient.GetAsync from .net 5");
             await regularHttpClient.GetAsync("default-handler");
-            Console.WriteLine("Called regularHttpClient.GetAsync");
+            Console.WriteLine("Called regularHttpClient.GetAsync from .net 5");
 
             return 0;
         }
