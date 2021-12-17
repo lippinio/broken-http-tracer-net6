@@ -19,10 +19,10 @@ RUN apt-get update \
     curl
 
 # Set up Datadog APM
-ARG TRACER_VERSION=1.30.0
+ARG TRACER_VERSION=2.0.0
 RUN mkdir -p /var/log/datadog
 RUN mkdir -p /opt/datadog
-RUN curl -LO https://github.com/DataDog/dd-trace-dotnet/releases/download/v${TRACER_VERSION}/datadog-dotnet-apm_${TRACER_VERSION}_amd64.deb
+RUN curl -LO https://github.com/DataDog/dd-trace-dotnet/releases/download/v${TRACER_VERSION}-prerelease/datadog-dotnet-apm_${TRACER_VERSION}_amd64.deb
 RUN dpkg -i ./datadog-dotnet-apm_${TRACER_VERSION}_amd64.deb
 
 ENV CORECLR_ENABLE_PROFILING=1
